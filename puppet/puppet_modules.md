@@ -73,6 +73,7 @@ puppet agent -t
 
 It contacts the master, downloads the module, and applies the class.
 
+## Practical Steps:
 
 **Machine :** Master
 ```sh
