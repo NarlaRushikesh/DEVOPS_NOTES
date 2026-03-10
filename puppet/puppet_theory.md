@@ -1273,3 +1273,672 @@ Define system configuration
 Distribute configuration to servers
 Ensure systems remain in the desired state
 ```
+
+----
+
+
+# 6. Puppet Architecture
+
+Puppet architecture explains how Puppet components work together to automate server configuration.
+
+Puppet follows a **Master–Agent architecture** and uses a **Pull model** for configuration management.
+
+---
+
+# Basic Architecture
+
+```
+           Puppet Master
+                |
+        ---------------------
+        |         |         |
+     Server1   Server2   Server3
+       Agent      Agent      Agent
+          |          |          |
+        Facter     Facter     Facter
+```
+
+Components involved:
+
+- Puppet Master
+- Puppet Agent
+- Facter
+- Manifest
+- Catalog
+
+---
+
+# Main Idea of Puppet Architecture
+
+1. Administrator writes configuration (Manifest)
+2. Manifest is stored on Puppet Master
+3. Puppet Agent requests configuration
+4. Puppet Master compiles Catalog
+5. Puppet Agent applies configuration
+
+---
+
+# Step-by-Step Puppet Workflow
+
+## Step 1: Administrator Writes Manifest
+
+The administrator defines the desired configuration using Puppet manifests.
+
+Example manifest:
+
+```
+package { 'nginx':
+  ensure => installed,
+}
+
+service { 'nginx':
+  ensure => running,
+}
+```
+
+Meaning:
+
+```
+Install nginx
+Ensure nginx service is running
+```
+
+This manifest is stored on the **Puppet Master**.
+
+---
+
+## Step 2: Puppet Agent Requests Configuration
+
+Each client machine runs a **Puppet Agent**.
+
+The agent periodically contacts the Puppet Master and asks for configuration updates.
+
+Example request:
+
+```
+Do you have any configuration for me?
+```
+
+The default request interval is typically **30 minutes**.
+
+---
+
+## Step 3: Facter Collects System Information
+
+Before the master sends configuration, the agent sends system facts using **Facter**.
+
+Facter collects information such as:
+
+```
+Operating System
+Hostname
+IP Address
+Memory
+CPU
+Network Interfaces
+```
+
+Example facts:
+
+```
+OS: Ubuntu
+Hostname: server1
+IP: 192.168.1.10
+RAM: 8GB
+```
+
+These facts help the Puppet Master determine what configuration should be applied.
+
+---
+
+## Step 4: Puppet Master Compiles Catalog
+
+The Puppet Master uses:
+
+- Manifest files
+- Modules
+- System facts from Facter
+
+to generate a **Catalog**.
+
+A catalog is the **compiled configuration instructions for the client**.
+
+Example catalog:
+
+```
+Install nginx
+Start nginx service
+```
+
+---
+
+## Step 5: Catalog Sent to Agent
+
+The Puppet Master sends the compiled catalog to the Puppet Agent.
+
+```
+Puppet Master → Puppet Agent
+```
+
+---
+
+## Step 6: Agent Applies Configuration
+
+The Puppet Agent executes the catalog instructions on the server.
+
+Example actions:
+
+```
+Install nginx
+Start nginx service
+```
+
+The server is now configured according to the desired state.
+
+---
+
+## Step 7: Agent Sends Report
+
+After applying configuration, the Puppet Agent sends a **status report** to the Puppet Master.
+
+Example report:
+
+```
+Configuration applied successfully
+```
+
+If errors occur, they are reported as well.
+
+---
+
+# Complete Puppet Workflow
+
+```
+Admin writes Manifest
+        ↓
+Stored in Puppet Master
+        ↓
+Agent requests configuration
+        ↓
+Facter sends system facts
+        ↓
+Master compiles Catalog
+        ↓
+Catalog sent to Agent
+        ↓
+Agent applies configuration
+        ↓
+Agent sends report to Master
+```
+
+---
+
+# Idempotency in Puppet
+
+Puppet follows the principle of **Idempotency**.
+
+This means running the same configuration multiple times **will not change the system if it is already in the desired state**.
+
+Example desired state:
+
+```
+Nginx installed
+Nginx service running
+```
+
+Cases:
+
+If nginx is already installed:
+
+```
+Puppet does nothing
+```
+
+If nginx is missing:
+
+```
+Puppet installs nginx
+```
+
+---
+
+# Architecture Components Summary
+
+| Component | Role |
+|------|------|
+| Puppet Master | Stores configuration and generates catalog |
+| Puppet Agent | Applies configuration on servers |
+| Facter | Provides system information |
+| Manifest | Configuration code written in Puppet |
+| Catalog | Final compiled instructions for the agent |
+
+---
+
+# Key Characteristics of Puppet Architecture
+
+- Master–Agent model
+- Pull-based configuration system
+- Desired state management
+- Idempotent configuration
+
+---
+
+# Simple Summary
+
+```
+Admin writes configuration
+        ↓
+Puppet Master stores configuration
+        ↓
+Agent requests configuration
+        ↓
+Master compiles catalog
+        ↓
+Agent applies configuration
+```
+
+Puppet ensures that systems always remain in the **desired configuration state**.
+
+
+-----
+
+# 7. Puppet Master and Puppet Clients
+
+Puppet architecture consists of two main sides:
+
+1. Puppet Master (Server Side)
+2. Puppet Clients (Client Side)
+
+The Puppet Master stores configurations, while Puppet Clients receive and apply those configurations.
+
+---
+
+# 1. Puppet Master
+
+The **Puppet Master** is the central server responsible for managing and distributing configurations to client machines.
+
+It stores configuration code, templates, files, and security certificates.
+
+Puppet Agents running on client machines communicate with the Puppet Master to receive configuration updates.
+
+---
+
+# Puppet Master Components
+
+Important components within Puppet Master include:
+
+1. Manifest
+2. Template
+3. Files
+4. Certificate Authority (CA)
+
+---
+
+# 1. Manifest
+
+## Definition
+
+A **Manifest** is a file that contains Puppet configuration code.  
+It defines the **desired state of a system**.
+
+Manifest files have the extension:
+
+```
+.pp
+```
+
+---
+
+## Example Manifest
+
+```
+package { 'nginx':
+  ensure => installed,
+}
+
+service { 'nginx':
+  ensure => running,
+}
+```
+
+Meaning:
+
+```
+Install nginx
+Ensure nginx service is running
+```
+
+Puppet ensures that the system always remains in this desired state.
+
+---
+
+## Manifest Location
+
+Manifests are usually stored in the Puppet environment directory.
+
+Example:
+
+```
+/etc/puppetlabs/code/environments/production/manifests/
+```
+
+Example manifest file:
+
+```
+site.pp
+```
+
+---
+
+# 2. Template
+
+## Definition
+
+A **Template** is a dynamic configuration file used to generate different configurations for different servers.
+
+Templates allow variable values to be inserted into configuration files.
+
+Template files usually use the extension:
+
+```
+.erb
+```
+
+(Embedded Ruby template)
+
+---
+
+## Example Template
+
+Example template file:
+
+```
+nginx.conf.erb
+```
+
+Inside the template:
+
+```
+server_name <%= @hostname %>;
+```
+
+Puppet replaces the variable with the actual value.
+
+Example result:
+
+Server1:
+
+```
+server_name web1
+```
+
+Server2:
+
+```
+server_name web2
+```
+
+---
+
+# 3. Files
+
+## Definition
+
+The **Files** component is used to distribute static files from the Puppet Master to client machines.
+
+Examples of files:
+
+- Configuration files
+- Scripts
+- Application files
+- Static content
+
+---
+
+## Example
+
+Suppose we want to copy a configuration file to the server.
+
+Puppet code:
+
+```
+file { '/etc/nginx/nginx.conf':
+  source => 'puppet:///modules/nginx/nginx.conf',
+}
+```
+
+Meaning:
+
+```
+Copy nginx.conf from Puppet Master to the server
+```
+
+---
+
+## File Storage Example
+
+Files are usually stored inside a module:
+
+```
+modules/nginx/files/nginx.conf
+```
+
+---
+
+# 4. Certificate Authority (CA)
+
+## Definition
+
+The **Certificate Authority (CA)** manages secure communication between the Puppet Master and Puppet Agents.
+
+It ensures authentication and encrypted communication.
+
+---
+
+## Why CA is Important
+
+Without security, unauthorized systems could send fake configuration requests.
+
+The CA ensures that only trusted agents can communicate with the Puppet Master.
+
+---
+
+## Certificate Workflow
+
+1. Agent sends certificate request to Puppet Master
+2. Puppet Master reviews the request
+3. Master signs the certificate
+4. Secure communication is established
+
+Example flow:
+
+```
+Agent → Certificate Request → Master
+Master → Signs Certificate
+Secure communication established
+```
+
+---
+
+# Puppet Clients
+
+Puppet Clients are the machines that receive and apply configurations from the Puppet Master.
+
+Two main components run on the client side:
+
+1. Puppet Agent
+2. Facter
+
+---
+
+# 1. Puppet Agent
+
+## Definition
+
+The **Puppet Agent** is software installed on client machines that communicates with the Puppet Master.
+
+It requests configuration updates and applies them locally.
+
+---
+
+## Responsibilities of Puppet Agent
+
+The Puppet Agent:
+
+- Contacts the Puppet Master
+- Requests configuration updates
+- Receives the catalog
+- Applies configuration to the system
+- Sends status reports back to the master
+
+---
+
+## Agent Working Process
+
+Agents periodically contact the Puppet Master (default interval ~30 minutes).
+
+Example request:
+
+```
+Do you have any configuration updates?
+```
+
+If updates exist, the Puppet Master sends a catalog.
+
+The agent then applies the configuration.
+
+---
+
+## Example Workflow
+
+```
+Agent → Puppet Master
+Request configuration
+
+Puppet Master → Agent
+Send catalog
+
+Agent → Apply configuration
+```
+
+Example result:
+
+```
+nginx installed
+nginx service started
+```
+
+---
+
+# 2. Facter
+
+## Definition
+
+**Facter** is a system profiling tool that collects information (facts) about the client machine.
+
+It provides system details to the Puppet Master.
+
+---
+
+## Information Collected by Facter
+
+Examples of facts collected:
+
+```
+Operating System
+Hostname
+IP Address
+CPU
+Memory
+Disk information
+Network interfaces
+```
+
+Example facts:
+
+```
+OS: Ubuntu
+Hostname: webserver1
+IP Address: 192.168.1.10
+Memory: 8GB
+CPU: 4 cores
+```
+
+---
+
+## Why Facter is Important
+
+Puppet can apply different configurations based on system information.
+
+Example:
+
+```
+Ubuntu server → install nginx
+Windows server → install IIS
+```
+
+Puppet uses Facter data to make these decisions.
+
+---
+
+# Example Puppet Condition
+
+Example Puppet code using facts:
+
+```
+if $facts['os']['name'] == 'Ubuntu' {
+  package { 'nginx':
+    ensure => installed,
+  }
+}
+```
+
+Meaning:
+
+```
+If OS is Ubuntu
+Install nginx
+```
+
+---
+
+# Puppet Client Workflow
+
+```
+Agent → Contacts Puppet Master
+Facter → Sends system information
+Master → Compiles catalog
+Agent → Applies configuration
+```
+
+---
+
+# Summary Table
+
+| Component | Role |
+|------|------|
+| Manifest | Defines system configuration |
+| Template | Creates dynamic configuration files |
+| Files | Copies static files to client machines |
+| Certificate Authority | Provides secure communication |
+| Puppet Agent | Applies configuration on client systems |
+| Facter | Collects system information |
+
+---
+
+# Key Takeaway
+
+Puppet works by combining **Master components and Client components**.
+
+```
+Puppet Master → stores configuration
+Puppet Agent → applies configuration
+Facter → provides system information
+```
+
+Together they ensure systems remain in the **desired configuration state**.
+
+
+----
+
+
