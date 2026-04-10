@@ -1,5 +1,5 @@
 
-#1. Continuous Monitoring Concepts
+# 1. Continuous Monitoring Concepts
 
 ## Monitoring
 Monitoring is the process of observing a system’s health, performance, and availability.
