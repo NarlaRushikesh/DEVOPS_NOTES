@@ -978,4 +978,247 @@ Deletes all Terraform-managed infrastructure.
 * Ensures safe, predictable, and consistent deployments
 
 ---
+---
+
+# 5. 🚀 Terraform Configuration Language (HCL) — Notes
+
+---
+
+## 🧠 1. What is HCL?
+
+### ✅ Definition:
+
+HCL (HashiCorp Configuration Language) is the language used by Terraform to define infrastructure in a human-readable and declarative format.
+
+---
+
+## 🧩 Key Idea
+
+* HCL is simple and readable
+* It follows a **declarative approach**
+
+👉 You define:
+
+> What infrastructure you want
+
+👉 Not:
+
+> How to create it step-by-step
+
+---
+
+## ⚙️ 2. Terraform Configuration Structure
+
+* Terraform uses `.tf` files
+* Configuration is written using **blocks**
+
+---
+
+## 🧱 3. Main Building Blocks
+
+---
+
+### 🔹 3.1 Provider Block
+
+#### 📌 Purpose:
+
+Defines the platform where infrastructure will be created
+
+#### 🧠 Concept:
+
+* Acts as a bridge between Terraform and cloud platforms
+
+#### Examples:
+
+* AWS provider
+* Azure provider
+
+---
+
+### 🔹 3.2 Resource Block (Most Important)
+
+#### 📌 Purpose:
+
+Defines infrastructure components
+
+#### 🧠 Concept:
+
+> Resource = actual infrastructure
+
+#### Examples:
+
+* Virtual machines
+* Databases
+* Networks
+
+---
+
+### 🔹 3.3 Variable Block
+
+#### 📌 Purpose:
+
+Makes configuration dynamic and reusable
+
+#### 🧠 Concept:
+
+* Avoid hardcoding values
+* Improves flexibility
+
+---
+
+### 🔹 3.4 Output Block
+
+#### 📌 Purpose:
+
+Displays useful information after execution
+
+#### Examples:
+
+* Server IP address
+* Application URL
+
+---
+
+## 🧩 4. General HCL Structure
+
+```
+block_type "label1" "label2" {
+  key = value
+}
+```
+
+---
+
+### 🧩 Resource Structure
+
+```
+resource "type" "name" {
+  attribute = value
+}
+```
+
+---
+
+## 🧠 5. Important Concepts
+
+---
+
+### 🔹 Declarative Syntax
+
+* Define desired state
+* Terraform handles execution
+
+---
+
+### 🔹 Arguments
+
+* Key-value pairs inside blocks
+
+Example:
+
+```
+instance_type = "t2.micro"
+```
+
+---
+
+### 🔹 Expressions
+
+* Used for dynamic values
+
+---
+
+### 🔹 References
+
+* One resource can refer to another
+
+---
+
+## 🔗 6. Dependency Handling
+
+---
+
+### 🔹 Automatic Dependencies
+
+* Terraform detects relationships automatically
+* Determines execution order
+
+#### Example:
+
+* Network → Server
+* Network created first
+
+---
+
+## 🧠 7. File Organization
+
+Typical Terraform files:
+
+* `main.tf` → main configuration
+* `variables.tf` → variable definitions
+* `outputs.tf` → output values
+
+---
+
+## ⚠️ 8. Common Mistakes
+
+* ❌ Hardcoding values
+  ✔️ Use variables
+
+* ❌ Ignoring outputs
+  ✔️ Useful for debugging
+
+* ❌ Writing imperative logic
+  ✔️ Terraform is declarative
+
+---
+
+## 🎯 9. Interview Questions
+
+### ❓ What is HCL?
+
+HCL is the language used by Terraform to define infrastructure in a declarative format.
+
+---
+
+### ❓ What are main blocks in Terraform?
+
+* Provider
+* Resource
+* Variable
+* Output
+
+---
+
+### ❓ What is a resource?
+
+A resource represents an infrastructure component such as a VM, database, or network.
+
+---
+
+### ❓ Why use variables?
+
+To make configurations reusable and dynamic.
+
+---
+
+## ✅ Summary
+
+* HCL is Terraform’s configuration language
+
+* Uses `.tf` files
+
+* Core blocks:
+
+  * Provider
+  * Resource
+  * Variable
+  * Output
+
+* Declarative approach
+
+* Supports reusability and dependency handling
+
+---
+
 
