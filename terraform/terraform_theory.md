@@ -482,3 +482,500 @@ Terraform is used for infrastructure provisioning, while Ansible is used for con
 * Works with tools like Ansible
 
 ---
+---
+# 3. 🚀 Terraform Architecture — Notes
+
+---
+
+## 🧠 1. What is Terraform Architecture?
+
+Terraform architecture describes how Terraform internally works to provision and manage infrastructure.
+
+It defines:
+
+* Core components
+* Their roles
+* Interaction between components
+* Execution flow
+
+---
+
+## 🧩 2. High-Level Components
+
+Terraform architecture consists of:
+
+* Terraform CLI
+* Configuration Files
+* Providers
+* Resources
+* State
+* Execution Plan
+
+---
+
+## ⚙️ 3. Core Components (Detailed)
+
+---
+
+### 🔹 3.1 Terraform CLI
+
+Command Line Interface used to interact with Terraform.
+
+#### Responsibilities:
+
+* Reads configuration files
+* Executes commands
+* Communicates with providers
+* Manages state
+
+---
+
+### 🔹 3.2 Configuration Files
+
+* Written in HCL (HashiCorp Configuration Language)
+* File extension: `.tf`
+
+#### Contains:
+
+* Providers
+* Resources
+* Variables
+* Outputs
+
+---
+
+### 🔹 3.3 Providers (Very Important)
+
+#### Definition:
+
+A provider is a plugin that enables Terraform to interact with external APIs such as AWS, Azure, or GCP.
+
+#### Key Points:
+
+* Acts as a bridge between Terraform and cloud platforms
+* Terraform does not directly create resources
+* Providers handle API communication
+
+---
+
+### 🔹 3.4 Resources
+
+Resources represent actual infrastructure components.
+
+#### Examples:
+
+* Virtual machines
+* Databases
+* Networks
+* Storage systems
+
+#### Key Idea:
+
+> Resource = What you want to create
+
+---
+
+### 🔹 3.5 State (Critical Concept)
+
+#### Definition:
+
+State is a file that tracks the current infrastructure managed by Terraform.
+
+#### Purpose:
+
+* Tracks existing resources
+* Maps configuration to real infrastructure
+* Prevents duplication
+* Enables updates and deletions
+
+#### Key Insight:
+
+Without state, Terraform cannot determine:
+
+* What exists
+* What needs to change
+
+---
+
+### 🔹 3.6 Execution Plan
+
+#### Definition:
+
+Execution plan shows what Terraform will do before applying changes.
+
+#### Includes:
+
+* Resources to create
+* Resources to update
+* Resources to delete
+
+---
+
+## 🔄 4. Internal Working Flow
+
+---
+
+### Step 1: Write Configuration
+
+Define infrastructure in `.tf` files
+
+---
+
+### Step 2: Initialize Terraform
+
+* Downloads required providers
+* Prepares environment
+
+---
+
+### Step 3: Create Execution Plan
+
+* Compares desired state with current state
+
+---
+
+### Step 4: Apply Changes
+
+* Calls provider APIs
+* Creates/updates infrastructure
+
+---
+
+### Step 5: Update State
+
+* Saves updated infrastructure details
+
+---
+
+## 🧠 5. Resource Graph
+
+#### Definition:
+
+Terraform builds a dependency graph of resources before execution.
+
+#### Purpose:
+
+* Determines execution order
+* Handles dependencies automatically
+
+#### Example:
+
+* VPC → Subnet → Server
+  Terraform ensures correct order automatically
+
+---
+
+## 🔗 6. Component Interaction
+
+### Flow:
+
+User → CLI → Provider → Cloud → State
+
+---
+
+## 🧠 7. Key Characteristics
+
+### ✅ Plugin-Based Architecture
+
+* Providers act as plugins
+* Easily extendable
+
+---
+
+### ✅ Declarative Model
+
+* Focus on desired state
+
+---
+
+### ✅ State-Driven Execution
+
+* Uses state to manage infrastructure
+
+---
+
+### ✅ Dependency Management
+
+* Automatically resolves execution order
+
+---
+
+## ⚠️ 8. Common Mistakes
+
+* ❌ Terraform directly creates resources
+  ✔️ Providers create resources
+
+* ❌ State is optional
+  ✔️ State is essential
+
+* ❌ Execution order is random
+  ✔️ Controlled via dependency graph
+
+---
+
+## 🎯 9. Interview Questions
+
+### ❓ What are Terraform components?
+
+Terraform CLI, Providers, Resources, State, Configuration files
+
+---
+
+### ❓ What is a provider?
+
+A plugin that enables interaction with cloud platforms.
+
+---
+
+### ❓ What is state?
+
+A file that tracks current infrastructure.
+
+---
+
+### ❓ What is execution plan?
+
+A preview of infrastructure changes before applying them.
+
+---
+
+## ✅ Summary
+
+* Terraform architecture includes CLI, Providers, Resources, State, and Configuration files
+* Providers act as a bridge to cloud platforms
+* State tracks infrastructure
+* Resource graph handles dependencies
+* Execution plan previews changes
+
+---
+---
+
+
+# 4. 🚀 Terraform Workflow — Notes
+
+---
+
+## 🧠 1. What is Terraform Workflow?
+
+### ✅ Definition:
+
+Terraform workflow is the sequence of steps used to provision, update, and manage infrastructure.
+
+---
+
+## 🔄 2. Core Workflow Steps
+
+```
+init → plan → apply → destroy
+```
+
+Each step plays a specific role in infrastructure management.
+
+---
+
+## ⚙️ 3. Step-by-Step Explanation
+
+---
+
+### 🔹 3.1 terraform init
+
+#### 📌 Purpose:
+
+Initialize the Terraform working directory
+
+#### 🧠 What Happens:
+
+* Downloads required providers
+* Sets up backend (state storage)
+* Prepares environment
+
+#### 🎯 Key Idea:
+
+Prepares Terraform to execute configuration
+
+#### ⚠️ Notes:
+
+* Must be run before other commands
+* Run again if configuration changes significantly
+
+---
+
+### 🔹 3.2 terraform plan
+
+#### 📌 Purpose:
+
+Preview changes before applying
+
+#### 🧠 What Happens:
+
+* Reads configuration files
+* Reads state file
+* Compares:
+
+  * Desired state (configuration)
+  * Current state (existing infrastructure)
+
+#### 📊 Output:
+
+* Resources to create
+* Resources to update
+* Resources to delete
+
+#### 🎯 Key Idea:
+
+Dry run (no actual changes)
+
+---
+
+### 🔹 3.3 terraform apply
+
+#### 📌 Purpose:
+
+Apply changes to infrastructure
+
+#### 🧠 What Happens:
+
+* Executes the plan
+* Calls provider APIs
+* Creates/updates/deletes resources
+* Updates state file
+
+#### 🎯 Key Idea:
+
+Transforms plan into real infrastructure
+
+#### ⚠️ Notes:
+
+* Makes actual changes
+* May require user confirmation
+
+---
+
+### 🔹 3.4 terraform destroy
+
+#### 📌 Purpose:
+
+Delete all managed infrastructure
+
+#### 🧠 What Happens:
+
+* Reads state file
+* Identifies resources
+* Deletes them via providers
+
+#### 🎯 Key Idea:
+
+Clean up infrastructure completely
+
+#### ⚠️ Notes:
+
+* Use carefully (can remove all resources)
+
+---
+
+## 🔁 4. Workflow Flow
+
+1. Write configuration
+2. Run `init`
+3. Run `plan`
+4. Run `apply`
+5. State is updated
+6. Use `destroy` if needed
+
+---
+
+## 🧠 5. Key Concepts
+
+---
+
+### 🔹 Desired vs Current State
+
+* Desired → defined in configuration
+* Current → stored in state
+
+---
+
+### 🔹 Execution Plan
+
+* Generated during `plan`
+* Used in `apply`
+
+---
+
+### 🔹 Idempotency
+
+* Running multiple times does not create duplicates
+
+---
+
+## 🧩 6. Real-World Analogy (Building a House)
+
+| Step    | Terraform   | Real World       |
+| ------- | ----------- | ---------------- |
+| init    | Setup tools | Gather materials |
+| plan    | Blueprint   | Design plan      |
+| apply   | Build       | Construction     |
+| destroy | Remove      | Demolition       |
+
+---
+
+## 🧠 7. Characteristics
+
+* Predictable (plan shows changes)
+* Safe (preview before execution)
+* Repeatable (consistent results)
+* Controlled (approval before apply)
+
+---
+
+## ⚠️ 8. Common Mistakes
+
+* ❌ Skipping `plan`
+  ✔️ Always review changes
+
+* ❌ Running `destroy` carelessly
+  ✔️ Can delete all resources
+
+* ❌ Not running `init`
+  ✔️ Required before execution
+
+---
+
+## 🎯 9. Interview Questions
+
+### ❓ What is Terraform workflow?
+
+Sequence of steps (init, plan, apply, destroy) to manage infrastructure.
+
+---
+
+### ❓ What does terraform init do?
+
+Initializes directory and downloads providers.
+
+---
+
+### ❓ Difference between plan and apply?
+
+* plan → preview changes
+* apply → execute changes
+
+---
+
+### ❓ What does destroy do?
+
+Deletes all Terraform-managed infrastructure.
+
+---
+
+## ✅ Summary
+
+* Terraform workflow: init → plan → apply → destroy
+* init prepares environment
+* plan previews changes
+* apply executes changes
+* destroy removes infrastructure
+* Ensures safe, predictable, and consistent deployments
+
+---
+
