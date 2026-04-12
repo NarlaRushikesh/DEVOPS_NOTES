@@ -375,13 +375,257 @@ You will have:
 * ✅ CPU monitoring working
 * ✅ Web UI accessible
 
+----
+----
+----
+
+
+# 📘 Adding Services in Existing Nagios Setup
+
+## 📌 Context
+
+* **Nagios Server:** `puppet-master`
+* **Nagios Client:** `puppet-agent`
+* Communication via **NRPE (port 5666)**
+* Existing setup already monitors **CPU Load**
+
 ---
 
-# 🚀 Next Improvements (Optional)
+# 🧠 Concept
 
-* Disk monitoring
-* Memory monitoring
-* Web server monitoring
-* Custom plugins
+* **Host = Machine (puppet-agent)**
+* **Service = What to monitor (Disk, Users, Processes, etc.)**
+
+👉 To add new services:
+
+* Configure **service definitions on server**
+* Ensure **corresponding commands exist on client (NRPE)**
 
 ---
+
+# 🚀 PART 1: Add Services on Nagios Server (puppet-master)
+
+---
+
+## 🔹 Step 1: Open Client Config File
+
+```bash
+sudo nano /usr/local/nagios/etc/objects/clients.cfg
+```
+
+👉 This file contains:
+
+* Host definition
+* All service definitions for that host
+
+---
+
+## 🔹 Step 2: Add New Service Blocks
+
+### ✅ Disk Usage
+
+```bash
+define service {
+    use                     generic-service
+    host_name               puppet-agent
+    service_description     Disk Usage
+    check_command           check_nrpe!check_disk
+}
+```
+
+---
+
+### ✅ Current Users
+
+```bash
+define service {
+    use                     generic-service
+    host_name               puppet-agent
+    service_description     Current Users
+    check_command           check_nrpe!check_users
+}
+```
+
+---
+
+### ✅ Total Processes
+
+```bash
+define service {
+    use                     generic-service
+    host_name               puppet-agent
+    service_description     Total Processes
+    check_command           check_nrpe!check_procs
+}
+```
+
+---
+
+## 🔹 Step 3: Validate Configuration (MANDATORY)
+
+```bash
+sudo /usr/local/nagios/bin/nagios -v /usr/local/nagios/etc/nagios.cfg
+```
+
+👉 Purpose:
+
+* Detect syntax errors
+* Prevent Nagios service failure
+
+---
+
+## 🔹 Step 4: Restart Nagios
+
+```bash
+sudo systemctl restart nagios
+```
+
+👉 Applies new service configurations
+
+---
+
+## 🔹 Step 5: Verify in Web UI
+
+* Navigate to: **Services**
+* Confirm new services appear:
+
+  * Disk Usage
+  * Current Users
+  * Total Processes
+
+---
+
+# ⚠️ PART 2: Ensure Commands Exist on Client (puppet-agent)
+
+---
+
+## 🔹 Step 1: Check Existing NRPE Commands
+
+```bash
+cat /etc/nagios/nrpe.cfg | grep command
+```
+
+👉 Look for:
+
+* `check_disk`
+* `check_users`
+* `check_procs`
+
+---
+
+## 🔹 Step 2: If Commands Already Exist
+
+👉 No action needed — services will work directly
+
+---
+
+## 🔴 Step 3: If Command is MISSING (Important Case)
+
+👉 You MUST manually define it in NRPE config
+
+---
+
+### 🔹 Open NRPE Config
+
+```bash
+sudo nano /etc/nagios/nrpe.cfg
+```
+
+---
+
+### 🔹 Add Missing Commands (Examples)
+
+```bash
+command[check_disk]=/usr/lib/nagios/plugins/check_disk -w 20% -c 10% -p /
+command[check_users]=/usr/lib/nagios/plugins/check_users -w 5 -c 10
+command[check_procs]=/usr/lib/nagios/plugins/check_procs -w 250 -c 400
+```
+
+👉 These define what NRPE executes when server requests data
+
+---
+
+## 🔹 Step 4: Restart NRPE Service
+
+```bash
+sudo systemctl restart nagios-nrpe-server
+```
+
+👉 Applies new command definitions
+
+---
+
+## 🔹 Step 5: Test from Server (Recommended)
+
+On **puppet-master**:
+
+```bash
+/usr/lib/nagios/plugins/check_nrpe -H <AGENT_PRIVATE_IP> -c check_disk
+```
+
+👉 Expected:
+
+* Output showing disk status (OK/WARNING/CRITICAL)
+
+---
+
+# 🚨 Common Errors & Fixes
+
+---
+
+## ❌ Service shows UNKNOWN
+
+👉 Cause:
+
+* Command not defined in NRPE
+
+👉 Fix:
+
+* Add command in `/etc/nagios/nrpe.cfg`
+* Restart NRPE
+
+---
+
+## ❌ Nagios not restarting
+
+👉 Cause:
+
+* Syntax error in `clients.cfg`
+
+👉 Fix:
+
+```bash
+sudo /usr/local/nagios/bin/nagios -v /usr/local/nagios/etc/nagios.cfg
+```
+
+---
+
+## ❌ NRPE connection failed
+
+👉 Causes:
+
+* Wrong IP in `allowed_hosts`
+* Port 5666 blocked
+
+---
+
+# 🎯 Final Outcome
+
+After completing this:
+
+* ✅ Multiple services added to existing host
+* ✅ Server properly configured
+* ✅ Client provides required metrics
+* ✅ Monitoring visible in Nagios UI
+
+---
+
+# 🧠 Key Takeaways
+
+* Services are defined **on server**
+* Commands are executed **on client**
+* NRPE acts as communication bridge
+* Always validate config before restart
+
+---
+
