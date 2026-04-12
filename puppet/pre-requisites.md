@@ -24,6 +24,8 @@ ping <Other-VM-Private-IP>
 ## Step-3
 - Use same network settings for all the instances.
 - Create one security group, like showed in the starting and use that security group only for every instance.
+- Only subnet will change for the agent instance, other than that all the things will be same.
 <img width="1918" height="766" alt="image" src="https://github.com/user-attachments/assets/8aac47de-1aee-4c76-8cad-ebd3f638091b" />
 
 ## In the same way create both the instances. 
+
