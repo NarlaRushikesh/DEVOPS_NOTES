@@ -133,3 +133,76 @@ Nagios Core → Plugin → System Check → Result → Alert
 
 ----
 ----
+
+
+# 3. Nagios Architecture - Example Explanation
+
+## Scenario
+Monitoring a Web Server using Nagios
+
+---
+
+## Machines Involved
+
+### 1. Nagios Server
+- Nagios Core
+- Plugins
+- Apache Web Server
+- Web Interface
+
+### 2. Target Server (Web Server)
+- Application (Website)
+- NRPE Agent
+
+---
+
+## Architecture Flow
+
+1. Nagios Core schedules check
+2. Plugin executes check
+3. Request sent to target machine
+4. Result returned (OK/WARNING/CRITICAL)
+5. Nagios processes result
+6. Alert triggered if needed
+
+---
+
+## Components
+
+### Nagios Core
+- Scheduling
+- Processing results
+- Alerting
+
+### Plugins
+- Perform checks
+- Example: check_http, check_cpu
+
+### NRPE
+- Executes commands on remote machine
+
+---
+
+## Hosts vs Services
+
+Host: Machine (Web Server)  
+Service: HTTP, CPU, Disk
+
+---
+
+## Monitoring Types
+
+### Active Check
+- Nagios initiates check
+
+### Passive Check
+- Remote system sends result
+
+---
+
+## Key Understanding
+
+- Nagios Core = Brain
+- Plugin = Worker
+- NRPE = Messenger
+- Target Machine = System being monitored
