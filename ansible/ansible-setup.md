@@ -229,3 +229,175 @@ ssh-keygen -R <MANAGED_NODE_IP>
 * Service management
 
 ---
+---
+
+
+# ⚡ Ansible Ad-hoc Commands (Practical 2)
+
+## 🧠 What are Ad-hoc Commands?
+
+* One-line commands used for **quick tasks**
+* No need to write full playbooks
+* Useful for:
+
+  * Testing
+  * Quick fixes
+  * Simple automation
+
+---
+
+# 📍 Where to Run?
+
+👉 ALL commands run on:
+
+* ✅ **CONTROL NODE**
+
+---
+
+# 🔹 Step 1: Test Connectivity
+
+```bash
+ansible -i inventory servers -m ping
+```
+
+✅ Output:
+
+```json
+"ping": "pong"
+```
+
+---
+
+# 🔹 Step 2: Check Uptime (Command Module)
+
+```bash
+ansible -i inventory servers -m command -a "uptime"
+```
+
+📌 Runs command on managed node
+
+---
+
+# 🔹 Step 3: Install Package (apt module)
+
+```bash
+ansible -i inventory servers -m apt -a "name=nginx state=present" --become
+```
+
+📌 Explanation:
+
+* `name=nginx` → package
+* `state=present` → install
+* `--become` → sudo access
+
+---
+
+# 🔹 Step 4: Check Service Status
+
+```bash
+ansible -i inventory servers -m service -a "name=nginx state=started" --become
+```
+
+---
+
+# 🔹 Step 5: Create File
+
+```bash
+ansible -i inventory servers -m file -a "path=/home/ubuntu/test.txt state=touch"
+```
+
+---
+
+# 🔹 Step 6: Copy File from Control → Managed
+
+## 👉 First create file (CONTROL NODE)
+
+```bash
+echo "Hello from Ansible" > hello.txt
+```
+
+## 👉 Copy using Ansible
+
+```bash
+ansible -i inventory servers -m copy -a "src=hello.txt dest=/home/ubuntu/hello.txt"
+```
+
+---
+
+# 🔹 Step 7: Remove File
+
+```bash
+ansible -i inventory servers -m file -a "path=/home/ubuntu/test.txt state=absent"
+```
+
+---
+
+# 🔹 Step 8: Gather System Info (Facts)
+
+```bash
+ansible -i inventory servers -m setup
+```
+
+📌 Shows:
+
+* OS
+* IP
+* Memory
+* CPU
+
+---
+
+# 🔹 Step 9: Use Shell Module
+
+```bash
+ansible -i inventory servers -m shell -a "df -h"
+```
+
+📌 Difference:
+
+* `command` → safer
+* `shell` → supports pipes, variables
+
+---
+
+# ❌ Common Errors
+
+## 1. Permission denied
+
+👉 Add:
+
+```bash
+--become
+```
+
+---
+
+## 2. Module failed
+
+👉 Run:
+
+```bash
+sudo apt update
+```
+
+---
+
+## 3. nginx not starting
+
+👉 Check:
+
+```bash
+systemctl status nginx
+```
+
+---
+
+# 🧠 Important Concepts (Viva)
+
+* Ad-hoc commands = quick automation
+* Modules = building blocks (ping, apt, copy, file)
+* `--become` = sudo privilege
+* `command` vs `shell`
+---
+---
+
